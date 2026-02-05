@@ -22,13 +22,12 @@ export const authOptions = {
       }
       return token;
     },
-    // async session({ session, token }) {
-    //   console.log(session);
-    //   if (session.user) {
-    //     session.user["id"] = token.id;
-    //   }
-    //   return session;
-    // },
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+      }
+      return session;
+    },
   },
   //   events: {
   //     async createUser(message) {

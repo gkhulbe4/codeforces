@@ -10,14 +10,19 @@
 !.yarn/releases
 !.yarn/versions
 
-.vscode
-.kiro
+/.vscode/
+/.kiro/
+
 # testing
 /coverage
 
 # next.js
 /.next/
 /out/
+# agent folders
+/.agent/
+/.agents/
+
 
 # production
 /build
