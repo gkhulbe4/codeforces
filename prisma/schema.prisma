@@ -66,7 +66,7 @@ model Submission {
   language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
   code       String
   status     STATUS
-  verdict    VERDICT
+  verdict    VERDICT?
   createdAt  DateTime @default(now())
   problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
