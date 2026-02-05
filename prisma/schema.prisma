@@ -48,17 +48,28 @@ model TestCase {
   problem        Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
 }
 
+model Language {
+  id          Int          @id @default(autoincrement())
+  key         String       @unique
+  name        String
+  monacoId    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
+}
+
 model Submission {
-  id        String   @id @default(cuid())
-  userId    String
-  problemId String
-  language  String
-  code      String
-  status    STATUS
-  verdict   VERDICT
-  createdAt DateTime @default(now())
-  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(cuid())
+  userId     String
+  problemId  String
+  languageId Int
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
+  code       String
+  status     STATUS
+  verdict    VERDICT
+  createdAt  DateTime @default(now())
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {

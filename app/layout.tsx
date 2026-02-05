@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import AuthSessionProvider from "@/components/providers/session-provider";
+import { ThemeProvider } from "@/components/providers/theme-provider";
 import Header from "@/components/base/Header";
 import { Toaster } from "sonner";
 
@@ -29,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -49,11 +50,18 @@ export default function RootLayout({
       <body
         className={`${satoshi.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <AuthSessionProvider>
-          <Toaster />
-          <Header />
-          {children}
-        </AuthSessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthSessionProvider>
+            <Toaster />
+            <Header />
+            {children}
+          </AuthSessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
