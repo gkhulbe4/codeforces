@@ -18,7 +18,7 @@ interface TestCase {
 export default function CreateProblemPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [timeLimit, setTimeLimit] = useState(1000);
+  const [timeLimit, setTimeLimit] = useState(2000);
   const [memoryLimit, setMemoryLimit] = useState(256);
   const [testCases, setTestCases] = useState<TestCase[]>([]);
 

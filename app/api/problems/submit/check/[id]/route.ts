@@ -13,8 +13,11 @@ export async function GET(
         id: id,
       },
     });
-    if (submission?.status === "RUNNING" || submission?.status === "PENDING") {
-      return NextResponse.json({ status: submission?.status }, { status: 200 });
+    if (!submission) {
+      return NextResponse.json(
+        { error: "Submission not found" },
+        { status: 404 },
+      );
     }
     return NextResponse.json({ submission }, { status: 200 });
   } catch (error) {

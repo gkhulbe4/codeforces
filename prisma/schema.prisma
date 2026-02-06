@@ -65,6 +65,7 @@ model Submission {
   languageId Int
   language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
   code       String
+  stderr     String?
   status     STATUS
   verdict    VERDICT?
   createdAt  DateTime @default(now())
