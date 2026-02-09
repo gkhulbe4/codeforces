@@ -19,13 +19,16 @@ export async function POST(req: NextRequest) {
     });
     await redis.lpush(SUBMISSION_QUEUE, submission.id);
     return NextResponse.json(
-      { message: "Solution submitted successfully", submission },
+      {
+        message: "Solution submitted successfully",
+        submission,
+      },
       { status: 200 },
     );
   } catch (error) {
     console.log(error);
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { message: "Something went wrong" },
       { status: 500 },
     );
   }

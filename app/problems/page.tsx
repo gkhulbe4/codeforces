@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { ArrowRight, Brain, Clock, HardDrive, Search } from "lucide-react";
-
-export const dynamic = "force-dynamic";
+import { ArrowRight, Brain, Clock, Search } from "lucide-react";
 
 export default async function ProblemsPage() {
   const problems = await prisma.problem.findMany({
@@ -22,7 +20,6 @@ export default async function ProblemsPage() {
   return (
     <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-white">
       <main className="container mx-auto px-6 py-12">
-        {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 animate-fade-in">
           <div>
             <h1 className="font-display text-4xl font-bold text-foreground mb-3">
@@ -44,7 +41,6 @@ export default async function ProblemsPage() {
           </div>
         </div>
 
-        {/* Problems List */}
         <div className="grid gap-4 animate-slide-up">
           {problems.map((problem: any, index) => (
             <Link
@@ -81,7 +77,6 @@ export default async function ProblemsPage() {
                         <Brain size={12} className="text-primary/70" />
                         {problem._count?.submissions || 0} submissions
                       </span>
-                      {/* Assuming timeLimitMs/memoryLimitMb exist based on schema */}
                       {problem.timeLimitMs && (
                         <span className="flex items-center gap-1.5">
                           <Clock size={12} />

@@ -6,35 +6,61 @@ datasource db {
   provider = "postgresql"
 }
 
+enum DifficultyLevel {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum VERDICT {
+  AC
+  WA
+  TLE
+  MLE
+  RE
+  CE
+}
+
+enum STATUS {
+  PENDING
+  RUNNING
+  DONE
+}
+
 model User {
-  id            String          @id @default(cuid())
-  email         String          @unique
-  name          String?
-  createdAt     DateTime        @default(now())
-  emailVerified DateTime?
-  image         String?
-  updatedAt     DateTime        @updatedAt
-  accounts      Account[]
-  Authenticator Authenticator[]
-  problems      Problem[]
-  sessions      Session[]
-  submissions   Submission[]
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String?
+  createdAt           DateTime             @default(now())
+  emailVerified       DateTime?
+  image               String?
+  updatedAt           DateTime             @updatedAt
+  accounts            Account[]
+  Authenticator       Authenticator[]
+  problems            Problem[]
+  sessions            Session[]
+  submissions         Submission[]
+  contestParticipants ContestParticipant[]
+  contestSubmissions  ContestSubmission[]
+  contests            Contest[]
 }
 
 model Problem {
-  id            String          @id @default(cuid())
-  title         String
-  description   String
-  difficulty    DifficultyLevel
-  timeLimitMs   Int
-  memoryLimitMb Int
-  createdBy     String
-  isPublished   Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-  creator       User            @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  submissions   Submission[]
-  testCases     TestCase[]
+  id                 String              @id @default(cuid())
+  title              String
+  description        String
+  difficulty         DifficultyLevel
+  timeLimitMs        Int
+  memoryLimitMb      Int
+  createdBy          String
+  isPublished        Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  creator            User                @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  submissions        Submission[]
+  testCases          TestCase[]
+  contestProblems    ContestProblem[]
+  contestSubmissions ContestSubmission[]
 }
 
 model TestCase {
@@ -49,13 +75,14 @@ model TestCase {
 }
 
 model Language {
-  id          Int          @id @default(autoincrement())
-  key         String       @unique
-  name        String
-  monacoId    String
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  submissions Submission[]
+  id                 Int                 @id @default(autoincrement())
+  key                String              @unique
+  name               String
+  monacoId           String
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  submissions        Submission[]
+  contestSubmissions ContestSubmission[]
 }
 
 model Submission {
@@ -71,6 +98,58 @@ model Submission {
   createdAt  DateTime @default(now())
   problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Contest {
+  id                  String               @id @default(cuid())
+  title               String
+  description         String
+  startTime           DateTime
+  durationInMinutes   Int
+  createdBy           String
+  creator             User                 @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  createdAt           DateTime             @default(now())
+  contestProblems     ContestProblem[]
+  contestParticipants ContestParticipant[]
+  contestSubmissions  ContestSubmission[]
+}
+
+model ContestProblem {
+  contestId String
+  problemId String
+  order     Int
+  createdAt DateTime @default(now())
+  contest   Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@id([contestId, problemId])
+}
+
+model ContestParticipant {
+  contestId String
+  userId    String
+  createdAt DateTime @default(now())
+  contest   Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([contestId, userId])
+}
+
+model ContestSubmission {
+  id         String   @id @default(cuid())
+  contestId  String
+  userId     String
+  problemId  String
+  languageId Int
+  code       String
+  stderr     String?
+  status     STATUS
+  verdict    VERDICT?
+  createdAt  DateTime @default(now())
+  contest    Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -121,25 +200,4 @@ model Authenticator {
   user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
-}
-
-enum DifficultyLevel {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum VERDICT {
-  AC
-  WA
-  TLE
-  MLE
-  RE
-  CE
-}
-
-enum STATUS {
-  PENDING
-  RUNNING
-  DONE
 }

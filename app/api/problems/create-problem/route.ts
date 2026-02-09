@@ -1,12 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { TestCase } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const body = await req.json();
     const { title, description, timeLimit, memoryLimit, testCases } = body;
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
         },
       },
     });
-    return Response.json(
+    return NextResponse.json(
       {
         message: "Problem created successfully",
         problem: title,
@@ -41,6 +42,9 @@ export async function POST(req: Request) {
     );
   } catch (error) {
     console.log(error);
-    return new Response("Error", { status: 500 });
+    return NextResponse.json(
+      { message: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

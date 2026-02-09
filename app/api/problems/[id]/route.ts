@@ -7,29 +7,35 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    console.log("checking for submission id: ", id);
-    const submission = await prisma.submission.findUnique({
+    const problem = await prisma.problem.findUnique({
       where: {
         id: id,
       },
+      select: {
+        id: true,
+        title: true,
+        difficulty: true,
+      },
     });
-    if (!submission) {
+
+    if (!problem) {
       return NextResponse.json(
-        { message: "Submission not found" },
+        { message: "Problem not found" },
         { status: 404 },
       );
     }
+
     return NextResponse.json(
       {
-        submission,
-        message: "Submission fetched successfully",
+        problem,
+        message: "Problem fetched successfully",
       },
       { status: 200 },
     );
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching problem:", error);
     return NextResponse.json(
-      { message: "Something went wrong" },
+      { message: "Internal server error" },
       { status: 500 },
     );
   }
