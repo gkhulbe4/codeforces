@@ -5,6 +5,7 @@ import AuthSessionProvider from "@/components/providers/session-provider";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import Header from "@/components/base/Header";
 import { Toaster } from "sonner";
+import QueryProvider from "@/components/providers/query-provider";
 
 const satoshi = Inter({
   variable: "--font-satoshi",
@@ -56,11 +57,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthSessionProvider>
-            <Toaster />
-            <Header />
-            {children}
-          </AuthSessionProvider>
+          <QueryProvider>
+            <AuthSessionProvider>
+              <Toaster />
+              <Header />
+              {children}
+            </AuthSessionProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

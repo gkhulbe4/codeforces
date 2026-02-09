@@ -6,6 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
+  console.log(id);
   try {
     console.log("checking for submission id: ", id);
     const submission = await prisma.submission.findUnique({

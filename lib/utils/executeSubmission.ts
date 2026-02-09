@@ -10,62 +10,93 @@ export async function executeSubmission(
   languageKey: string,
   testCases: TestCase[],
   timeLimitMs: number,
-  memoryLimitMb: number,
+  memoryLimitMb?: number,
 ) {
   const language =
     LANGUAGE_EXECUTION[languageKey as keyof typeof LANGUAGE_EXECUTION];
   if (!language) {
     await changeVerdict(submissionId, "RE", "Language not supported");
-    console.log("Language not supported");
     return;
   }
+  console.log("Language selected ", language);
 
-  const sandbox = await Sandbox.create("base");
-
+  let sandbox;
   try {
+    sandbox = await Sandbox.create("base");
     await sandbox.files.write(language.file, code);
+
     if (language.compile) {
-      const compile = await sandbox.commands.run(language.compile);
-      if (compile.exitCode !== 0) {
-        await changeVerdict(submissionId, "CE", compile.stderr);
-        console.log("Compilation error", compile.stderr);
+      console.log("=== COMPILATION STARTED ===");
+      console.log("Compile command:", language.compile);
+
+      try {
+        const compile = await sandbox.commands.run(language.compile);
+        // console.log("Stdout:", compile.stdout);
+        // console.log("Stderr:", compile.stderr);
+        // console.log("ExitCode:", compile.exitCode);
+
+        if (compile.exitCode !== 0) {
+          console.log("COMPILATION FAILED");
+          await changeVerdict(submissionId, "CE", compile.stderr);
+          await sandbox.kill();
+          return;
+        }
+        console.log("COMPILATION SUCCESS");
+      } catch (compileError: any) {
+        console.error("COMPILATION ERROR", compileError.message);
+        await changeVerdict(submissionId, "CE", compileError.message);
+        await sandbox.kill();
         return;
       }
     }
 
-    let t = 1;
-
+    console.log("Checking on test cases");
     for (const tc of testCases) {
+      const timeoutSeconds = Math.ceil(timeLimitMs / 1000);
+
       await sandbox.files.write("input.txt", tc.input);
-      const result = await sandbox.commands.run(`${language.run} < input.txt`, {
-        timeoutMs: timeLimitMs,
-      });
-      console.log(`TEST CASE ${t} result`, result);
-      t++;
+
+      const cmd = `timeout ${timeoutSeconds}s ${language.run} < input.txt`;
+
+      const result = await sandbox.commands.run(cmd);
+
+      if (result.exitCode === 124) {
+        console.log("TLE", result.stderr);
+        await changeVerdict(submissionId, "TLE");
+        await sandbox.kill();
+        return;
+      }
 
       if (result.exitCode !== 0) {
+        console.log("RE", result.stderr);
         await changeVerdict(submissionId, "RE", result.stderr);
-        console.log("Runtime error", result.stderr);
+        await sandbox.kill();
         return;
       }
 
       if (normalize(result.stdout) !== normalize(tc.expectedOutput)) {
-        await changeVerdict(submissionId, "WA", result.stderr);
-        console.log("Wrong answer", result.stderr);
+        console.log("WA");
+        await changeVerdict(submissionId, "WA");
+        await sandbox.kill();
         return;
       }
     }
 
+    console.log("All test cases passed!");
     await changeVerdict(submissionId, "AC");
   } catch (error: any) {
+    console.error("Error: ", error.message);
+
     if (error.message.includes("timeout")) {
-      await changeVerdict(submissionId, "TLE", error.message);
-      console.log("Time limit exceeded", error.message);
+      console.log("TLE", error.message);
+      await changeVerdict(submissionId, "TLE");
     } else {
+      console.log("RE", error.message);
       await changeVerdict(submissionId, "RE", error.message);
-      console.log("Runtime error", error.message);
     }
   } finally {
-    await sandbox.kill();
+    if (sandbox) {
+      await sandbox.kill();
+    }
   }
 }

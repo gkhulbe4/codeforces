@@ -4,7 +4,9 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Image from "next/image";
-import { Trophy, Code2, Users, Calendar, Activity } from "lucide-react";
+import { Trophy, Code2, Users, Activity } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -15,6 +17,21 @@ export default function ProfilePage() {
       router.push("/");
     }
   }, [status, router]);
+
+  const { data } = useQuery({
+    queryKey: ["user", session?.user?.id],
+    queryFn: async () => {
+      const res = await axios.get(
+        `/api/users/${session?.user?.id}/submissions`,
+      );
+      return res.data;
+    },
+    enabled: !!session?.user?.id,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+  });
+  console.log(data);
 
   if (status === "loading") {
     return (
@@ -50,7 +67,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-white">
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
-          {/* Profile Header */}
           <div className="bg-card border border-border/50 rounded-2xl p-8 shadow-lg shadow-black/5 relative overflow-hidden backdrop-blur-sm">
             <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary to-accent"></div>
             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -186,25 +202,42 @@ export default function ProfilePage() {
                 Recent Submissions
               </h3>
               <div className="space-y-4">
-                {[1, 2, 3].map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 text-sm p-3 rounded-lg hover:bg-secondary/30 transition-colors"
-                  >
+                {data?.submissions?.map(
+                  (submission: {
+                    code: string;
+                    createdAt: string;
+                    id: string;
+                    languageId: number;
+                    problem: { title: string };
+                    problemId: string;
+                    status: string;
+                    stderr: string;
+                    userId: string;
+                    verdict: string;
+                  }) => (
                     <div
-                      className={`w-2 h-2 rounded-full ${i === 0 ? "bg-green-500" : "bg-red-500"}`}
-                    ></div>
-                    <div className="flex-1">
-                      <p className="font-medium text-foreground">Two Sum</p>
-                      <p className="text-xs text-muted-foreground">Just now</p>
-                    </div>
-                    <span
-                      className={`text-xs font-mono ${i === 0 ? "text-green-500" : "text-red-500"}`}
+                      key={submission.id}
+                      className="flex items-center gap-3 text-sm p-3 rounded-lg hover:bg-secondary/30 transition-colors"
                     >
-                      {i === 0 ? "AC" : "WA"}
-                    </span>
-                  </div>
-                ))}
+                      <div
+                        className={`w-2 h-2 rounded-full ${submission.verdict === "AC" ? "bg-green-500" : "bg-red-500"}`}
+                      ></div>
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">
+                          {submission.problem.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(submission.createdAt).toLocaleString()}
+                        </p>
+                      </div>
+                      <span
+                        className={`text-xs font-mono ${submission.verdict === "AC" ? "text-green-500" : "text-red-500"}`}
+                      >
+                        {submission.verdict}
+                      </span>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </div>
