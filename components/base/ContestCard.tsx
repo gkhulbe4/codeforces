@@ -19,7 +19,6 @@ function ContestCard({ contest }: { contest: Contest }) {
       const res = await axios.get(
         `/api/contests/${contest.id}/checkRegistration?userId=${session.data?.user?.id}`,
       );
-      console.log(res);
       return res.data.isRegistered;
     },
     enabled: !!session.data?.user?.id,
@@ -65,7 +64,7 @@ function ContestCard({ contest }: { contest: Contest }) {
         <div className="flex flex-col justify-center items-end min-w-[140px]">
           {isRegistered ? (
             <div className="px-4 py-2 bg-primary/10 text-primary rounded-lg font-medium text-sm w-full text-center group-hover:bg-primary group-hover:text-white transition-colors">
-              View Contest
+              Start Contest
             </div>
           ) : (
             <div className="px-4 py-2 bg-primary/10 text-primary rounded-lg font-medium text-sm w-full text-center group-hover:bg-primary group-hover:text-white transition-colors">

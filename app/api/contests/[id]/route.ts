@@ -20,7 +20,11 @@ export async function GET(
             order: "asc",
           },
         },
-        contestParticipants: true,
+        _count: {
+          select: {
+            contestParticipants: true,
+          },
+        },
       },
     });
 

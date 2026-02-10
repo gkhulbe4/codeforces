@@ -4,6 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest) {
   try {
     const contest = await prisma.contest.findMany({
+      where: {
+        createdAt: {
+          lt: new Date(),
+        },
+      },
       select: {
         id: true,
         title: true,

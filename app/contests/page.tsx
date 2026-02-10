@@ -3,15 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import {
-  Trophy,
-  Calendar,
-  Users,
-  ListOrdered,
-  Clock,
-  ArrowRight,
-} from "lucide-react";
-import { formatDuration } from "@/lib/utils/formatDuration";
+import { Trophy, ArrowRight } from "lucide-react";
 import ContestCard from "@/components/base/ContestCard";
 
 export interface Contest {
