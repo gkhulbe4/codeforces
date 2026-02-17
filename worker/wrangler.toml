@@ -1,0 +1,12 @@
+name = "codeforces-worker"
+main = "main.ts"
+compatibility_date = "2025-02-14"
+compatibility_flags = ["nodejs_compat"]
+
+minify = true
+
+[triggers]
+crons = ["* * * * *"] # Runs every minute
+
+
+

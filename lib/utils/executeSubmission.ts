@@ -10,12 +10,13 @@ export async function executeSubmission(
   languageKey: string,
   testCases: TestCase[],
   timeLimitMs: number,
-  memoryLimitMb?: number,
+  memoryLimitMb: number | undefined,
+  prisma: any,
 ) {
   const language =
     LANGUAGE_EXECUTION[languageKey as keyof typeof LANGUAGE_EXECUTION];
   if (!language) {
-    await changeVerdict(submissionId, "RE", "Language not supported");
+    await changeVerdict(submissionId, "RE", "Language not supported", prisma);
     return;
   }
   console.log("Language selected ", language);
@@ -37,14 +38,14 @@ export async function executeSubmission(
 
         if (compile.exitCode !== 0) {
           console.log("COMPILATION FAILED");
-          await changeVerdict(submissionId, "CE", compile.stderr);
+          await changeVerdict(submissionId, "CE", compile.stderr, prisma);
           await sandbox.kill();
           return;
         }
         console.log("COMPILATION SUCCESS");
       } catch (compileError: any) {
         console.error("COMPILATION ERROR", compileError.message);
-        await changeVerdict(submissionId, "CE", compileError.message);
+        await changeVerdict(submissionId, "CE", compileError.message, prisma);
         await sandbox.kill();
         return;
       }
@@ -62,37 +63,37 @@ export async function executeSubmission(
 
       if (result.exitCode === 124) {
         console.log("TLE", result.stderr);
-        await changeVerdict(submissionId, "TLE");
+        await changeVerdict(submissionId, "TLE", undefined, prisma);
         await sandbox.kill();
         return;
       }
 
       if (result.exitCode !== 0) {
         console.log("RE", result.stderr);
-        await changeVerdict(submissionId, "RE", result.stderr);
+        await changeVerdict(submissionId, "RE", result.stderr, prisma);
         await sandbox.kill();
         return;
       }
 
       if (normalize(result.stdout) !== normalize(tc.expectedOutput)) {
         console.log("WA");
-        await changeVerdict(submissionId, "WA");
+        await changeVerdict(submissionId, "WA", undefined, prisma);
         await sandbox.kill();
         return;
       }
     }
 
     console.log("All test cases passed!");
-    await changeVerdict(submissionId, "AC");
+    await changeVerdict(submissionId, "AC", undefined, prisma);
   } catch (error: any) {
     console.error("Error: ", error.message);
 
     if (error.message.includes("timeout")) {
       console.log("TLE", error.message);
-      await changeVerdict(submissionId, "TLE");
+      await changeVerdict(submissionId, "TLE", undefined, prisma);
     } else {
       console.log("RE", error.message);
-      await changeVerdict(submissionId, "RE", error.message);
+      await changeVerdict(submissionId, "RE", error.message, prisma);
     }
   } finally {
     if (sandbox) {
