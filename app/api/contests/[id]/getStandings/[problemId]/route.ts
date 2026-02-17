@@ -1,12 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-export default async function GET(
+export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string; problemId: string } },
+  { params }: { params: Promise<{ id: string; problemId: string }> },
 ) {
-  const contestId = params.id;
-  const problemId = params.problemId;
+  const { id: contestId, problemId } = await params;
   try {
     const participants = await prisma.contestParticipant.findMany({
       where: {

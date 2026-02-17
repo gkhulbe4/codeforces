@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { prisma } from "./prisma";
+import { prisma } from "../prisma";
 
 async function main() {
   const lang = [
