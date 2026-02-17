@@ -15,7 +15,7 @@ import {
   ListOrdered,
 } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { DifficultyLevel } from "@prisma/client";
+import { DifficultyLevel } from "@/types/prisma";
 import { useSession } from "next-auth/react";
 
 interface Problem {

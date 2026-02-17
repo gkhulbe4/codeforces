@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatDate";
 import { formatDuration } from "@/lib/utils/formatDuration";
-import { DifficultyLevel } from "@prisma/client";
+import { DifficultyLevel } from "@/types/prisma";
 import { ContestTabs } from "@/components/base/contests/ContestTabs";
 import { Button } from "@/components/ui/button";
 

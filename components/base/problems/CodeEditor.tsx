@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import axios from "axios";
-import { STATUS } from "@prisma/client";
+import { STATUS } from "@/types/prisma";
 import { useSearchParams } from "next/navigation";
 
 interface Language {

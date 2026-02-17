@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DifficultyLevel } from "@prisma/client";
+import { DifficultyLevel } from "@/types/prisma";
 import { ProblemsTab } from "@/components/base/contests/ProblemsTab";
 import { StandingsTab } from "@/components/base/contests/StandingsTab";
 

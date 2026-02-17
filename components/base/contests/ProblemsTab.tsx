@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
-import { DifficultyLevel } from "@prisma/client";
+import { DifficultyLevel } from "@/types/prisma";
 
 interface Problem {
   id: string;
