@@ -1,21 +1,62 @@
-import { prisma } from "@/lib/prisma";
+"use client";
 import Link from "next/link";
 import { ArrowRight, Brain, Clock, Search } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
-export default async function ProblemsPage() {
-  const problems = await prisma.problem.findMany({
-    where: {
-      isPublished: true,
+export default function ProblemsPage() {
+  const { data: problems, isLoading } = useQuery({
+    queryKey: ["problems"],
+    queryFn: async () => {
+      const res = await axios.get("/api/problems/getAllProblems");
+      return res.data.problems;
     },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      _count: {
-        select: { submissions: true },
-      },
-    },
+    staleTime: 60 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background font-body">
+        <main className="container mx-auto px-6 py-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+            <div className="space-y-3">
+              <div className="w-48 h-10 bg-muted animate-pulse rounded-lg" />
+              <div className="w-96 h-6 bg-muted animate-pulse rounded-lg" />
+            </div>
+            <div className="w-full md:w-80 h-10 bg-muted animate-pulse rounded-lg" />
+          </div>
+
+          <div className="grid gap-4">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-card border border-border/60 rounded-xl p-6 relative overflow-hidden"
+              >
+                <div className="flex items-center justify-between gap-6">
+                  <div className="space-y-3 flex-1">
+                    <div className="flex gap-2">
+                      <div className="w-32 h-4 bg-muted animate-pulse rounded" />
+                      <div className="w-10 h-4 bg-muted animate-pulse rounded" />
+                    </div>
+                    <div className="w-2/3 h-7 bg-muted animate-pulse rounded-lg" />
+                    <div className="flex gap-3">
+                      <div className="w-20 h-5 bg-muted animate-pulse rounded" />
+                      <div className="w-24 h-5 bg-muted animate-pulse rounded" />
+                      <div className="w-16 h-5 bg-muted animate-pulse rounded" />
+                    </div>
+                  </div>
+                  <div className="w-5 h-5 bg-muted animate-pulse rounded-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-white">
@@ -54,6 +95,22 @@ export default async function ProblemsPage() {
               >
                 <div className="flex items-center justify-between gap-6">
                   <div className="space-y-2 flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        ID: {problem.id}
+                      </span>
+                      <Button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          navigator.clipboard.writeText(problem.id);
+                          toast.success("Problem ID copied to clipboard");
+                        }}
+                        className="text-xs py-1 h-6 cursor-pointer"
+                      >
+                        copy
+                      </Button>
+                    </div>
                     <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors tracking-tight truncate">
                       {problem.title}
                     </h3>
