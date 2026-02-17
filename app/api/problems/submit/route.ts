@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { userId, code, languageId, problemId } = body;
+    const { userId, code, languageId, problemId, contestId } = body;
     const submission = await prisma.submission.create({
       data: {
         userId,
@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
         languageId,
         code,
         status: STATUS.PENDING,
+        contestId,
       },
     });
     await redis.lpush(SUBMISSION_QUEUE, submission.id);

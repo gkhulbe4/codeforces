@@ -38,15 +38,15 @@ export default function ContestsPage() {
   const contests: Contest[] = data?.contest || [];
 
   return (
-    <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-white">
-      <main className="container mx-auto px-6 py-12">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6 animate-fade-in">
+    <div className="min-h-screen bg-background font-body text-foreground pb-20">
+      <main className="container mx-auto px-6 py-16">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-6 animate-fade-in">
           <div>
-            <h1 className="font-display text-4xl font-bold text-foreground mb-3 flex items-center gap-3">
-              <Trophy className="text-primary w-10 h-10" />
+            <h1 className="font-display text-4xl font-bold text-foreground mb-3 flex items-center gap-3 tracking-tight">
+              <Trophy className="text-primary w-8 h-8" />
               Contests
             </h1>
-            <p className="text-muted-foreground text-lg max-w-2xl">
+            <p className="text-muted-foreground text-lg max-w-2xl leading-relaxed">
               Participate in competitive programming contests to test your
               skills and climb the leaderboard.
             </p>
@@ -54,7 +54,7 @@ export default function ContestsPage() {
 
           <button
             onClick={() => router.push("/create-contest")}
-            className="group px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-xl font-medium transition-all flex items-center gap-2"
+            className="group px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium transition-all shadow-sm hover:shadow-md hover:bg-primary/90 flex items-center gap-2"
           >
             Create Contest
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -62,22 +62,22 @@ export default function ContestsPage() {
         </div>
 
         {isLoading ? (
-          <div className="grid gap-4 animate-pulse">
+          <div className="grid gap-6 animate-pulse">
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-40 bg-card rounded-2xl border border-border/50"
+                className="h-48 bg-card rounded-xl border border-border/50"
               />
             ))}
           </div>
         ) : isError ? (
-          <div className="text-center py-20 text-muted-foreground">
+          <div className="text-center py-24 text-muted-foreground bg-card border border-border/50 rounded-xl">
             Failed to load contests. Please try again later.
           </div>
         ) : contests.length === 0 ? (
-          <div className="text-center py-20 border-2 border-dashed border-border rounded-2xl">
+          <div className="text-center py-24 border border-dashed border-border rounded-xl bg-card/50">
             <Trophy className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-medium text-foreground mb-1">
+            <h3 className="text-lg font-medium text-foreground mb-1 font-display">
               No contests found
             </h3>
             <p className="text-muted-foreground">
@@ -85,7 +85,7 @@ export default function ContestsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4 animate-slide-up">
+          <div className="grid gap-6 animate-slide-up">
             {contests.map((contest) => (
               <ContestCard key={contest.id} contest={contest} />
             ))}

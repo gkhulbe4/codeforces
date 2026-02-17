@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import axios from "axios";
 import { STATUS } from "@prisma/client";
+import { useSearchParams } from "next/navigation";
 
 interface Language {
   id: number;
@@ -35,6 +36,8 @@ export function CodeEditor({ languages, problemId }: CodeEditorProps) {
   const [status, setStatus] = useState<STATUS | null>(null);
   const [verdict, setVerdict] = useState<string | null>(null);
   const [stderr, setStderr] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const contestId = searchParams.get("contestId");
 
   useEffect(() => {
     setMounted(true);
@@ -71,6 +74,7 @@ export function CodeEditor({ languages, problemId }: CodeEditorProps) {
         code,
         languageId: selectedLanguage.id,
         problemId,
+        contestId: contestId || null,
       });
 
       const interval = setInterval(async () => {

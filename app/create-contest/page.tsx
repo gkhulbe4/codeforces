@@ -163,7 +163,7 @@ export default function CreateContestPage() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium mb-2 flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Start Time
                   </label>
@@ -177,7 +177,7 @@ export default function CreateContestPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                  <label className="text-sm font-medium mb-2 flex items-center gap-2">
                     <Clock className="w-4 h-4" />
                     Duration (minutes)
                   </label>

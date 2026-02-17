@@ -41,26 +41,24 @@ model User {
   sessions            Session[]
   submissions         Submission[]
   contestParticipants ContestParticipant[]
-  contestSubmissions  ContestSubmission[]
   contests            Contest[]
 }
 
 model Problem {
-  id                 String              @id @default(cuid())
-  title              String
-  description        String
-  difficulty         DifficultyLevel
-  timeLimitMs        Int
-  memoryLimitMb      Int
-  createdBy          String
-  isPublished        Boolean             @default(true)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  creator            User                @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  submissions        Submission[]
-  testCases          TestCase[]
-  contestProblems    ContestProblem[]
-  contestSubmissions ContestSubmission[]
+  id              String           @id @default(cuid())
+  title           String
+  description     String
+  difficulty      DifficultyLevel
+  timeLimitMs     Int
+  memoryLimitMb   Int
+  createdBy       String
+  isPublished     Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  creator         User             @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  submissions     Submission[]
+  testCases       TestCase[]
+  contestProblems ContestProblem[]
 }
 
 model TestCase {
@@ -75,14 +73,13 @@ model TestCase {
 }
 
 model Language {
-  id                 Int                 @id @default(autoincrement())
-  key                String              @unique
-  name               String
-  monacoId           String
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  submissions        Submission[]
-  contestSubmissions ContestSubmission[]
+  id          Int          @id @default(autoincrement())
+  key         String       @unique
+  name        String
+  monacoId    String
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
 }
 
 model Submission {
@@ -90,6 +87,8 @@ model Submission {
   userId     String
   problemId  String
   languageId Int
+  contestId  String?
+  contest    Contest? @relation(fields: [contestId], references: [id], onDelete: Cascade)
   language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
   code       String
   stderr     String?
@@ -111,7 +110,7 @@ model Contest {
   createdAt           DateTime             @default(now())
   contestProblems     ContestProblem[]
   contestParticipants ContestParticipant[]
-  contestSubmissions  ContestSubmission[]
+  submissions         Submission[]
 }
 
 model ContestProblem {
@@ -133,23 +132,6 @@ model ContestParticipant {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([contestId, userId])
-}
-
-model ContestSubmission {
-  id         String   @id @default(cuid())
-  contestId  String
-  userId     String
-  problemId  String
-  languageId Int
-  code       String
-  stderr     String?
-  status     STATUS
-  verdict    VERDICT?
-  createdAt  DateTime @default(now())
-  contest    Contest  @relation(fields: [contestId], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem    Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  language   Language @relation(fields: [languageId], references: [id], onDelete: Cascade)
 }
 
 model Account {

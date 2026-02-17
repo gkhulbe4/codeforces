@@ -1,8 +1,9 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   Calendar,
   Clock,
@@ -10,10 +11,14 @@ import {
   Users,
   ArrowRight,
   Loader2,
+  UserPlus,
+  CheckCircle,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils/formatDate";
 import { formatDuration } from "@/lib/utils/formatDuration";
 import { DifficultyLevel } from "@prisma/client";
+import { ContestTabs } from "@/components/base/contests/ContestTabs";
+import { Button } from "@/components/ui/button";
 
 interface Problem {
   id: string;
@@ -42,7 +47,8 @@ interface ContestDetails {
 
 export default function ContestPage() {
   const params = useParams();
-  const router = useRouter();
+  const { data: session } = useSession();
+  const queryClient = useQueryClient();
   const id = params.id as string;
 
   const {
@@ -76,106 +82,70 @@ export default function ContestPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background font-body selection:bg-primary selection:text-white pb-20">
-      <main className="container mx-auto px-6 py-12 max-w-5xl">
-        <div className="bg-card border border-border/50 rounded-2xl p-8 shadow-lg shadow-black/5 mb-10 animate-fade-in relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-purple-600"></div>
-          <div className="flex flex-col md:flex-row justify-between gap-8">
+    <div className="min-h-screen bg-background font-body text-foreground pb-24">
+      <main className="container mx-auto px-6 py-16">
+        <div className="mb-12 animate-fade-in">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-6">
             <div className="space-y-4 flex-1">
               <div className="flex items-center gap-3 text-primary mb-2">
-                <Trophy className="w-6 h-6" />
-                <span className="font-display font-bold tracking-wide text-sm uppercase">
+                <Trophy className="w-5 h-5" />
+                <span className="font-display font-medium tracking-wide text-xs uppercase text-muted-foreground">
                   Competitive Programming
                 </span>
               </div>
-              <h1 className="font-display text-4xl font-bold text-foreground leading-tight">
+              <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground leading-tight tracking-tight">
                 {contest.title}
               </h1>
-              <p className="text-muted-foreground text-lg leading-relaxed whitespace-pre-line">
+              <p className="text-muted-foreground text-lg leading-relaxed max-w-2xl">
                 {contest.description}
               </p>
-
-              <div className="flex flex-wrap items-center gap-6 pt-4 text-sm font-medium text-muted-foreground">
-                <div className="flex items-center gap-2 bg-secondary/30 px-3 py-1.5 rounded-full">
-                  <Calendar className="w-4 h-4 text-primary" />
-                  {formatDate(contest.startTime)}
-                </div>
-                <div className="flex items-center gap-2 bg-secondary/30 px-3 py-1.5 rounded-full">
-                  <Clock className="w-4 h-4 text-primary" />
-                  {formatDuration(contest.durationInMinutes)}
-                </div>
-                <div className="flex items-center gap-2 bg-secondary/30 px-3 py-1.5 rounded-full">
-                  <Users className="w-4 h-4 text-primary" />
-                  {contest._count.contestParticipants} Participants
-                </div>
-              </div>
             </div>
 
-            <div className="flex flex-col justify-center min-w-[200px] border-l border-border/50 pl-8 md:text-right">
-              <div className="text-sm text-muted-foreground mb-1">Status</div>
-              <div className="text-xl font-bold text-green-500 flex items-center md:justify-end gap-2">
-                <span className="relative flex h-3 w-3">
+            <div className="flex shrink-0 gap-3">
+              <div className="px-4 py-2 bg-green-500/10 text-green-600 rounded-full text-sm font-medium flex items-center gap-2 border border-green-500/20">
+                <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                Active
+                Active Contest
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-8 pt-6 border-t border-border/40">
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Start Time
+              </span>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Calendar className="w-4 h-4 text-primary/70" />
+                {formatDate(contest.startTime)}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Duration
+              </span>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Clock className="w-4 h-4 text-primary/70" />
+                {formatDuration(contest.durationInMinutes)}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Participants
+              </span>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Users className="w-4 h-4 text-primary/70" />
+                {contest._count.contestParticipants} Joined
               </div>
             </div>
           </div>
         </div>
 
-        <div className="space-y-6 animate-slide-up">
-          <h2 className="text-2xl font-display font-bold flex items-center gap-3">
-            Problems
-            <span className="text-sm font-normal text-muted-foreground bg-secondary px-2 py-1 rounded-md">
-              {contest.contestProblems.length}
-            </span>
-          </h2>
-
-          <div className="grid gap-3">
-            {contest.contestProblems.map((bp) => (
-              <div
-                key={bp.problemId}
-                onClick={() =>
-                  router.push(`/contests/${contest.id}/problem/${bp.problemId}`)
-                }
-                className="group bg-card hover:bg-secondary/5 border border-border/50 rounded-xl p-5 transition-all cursor-pointer hover:border-primary/20 hover:shadow-md active:scale-[0.99] flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-5">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-secondary text-base font-bold font-mono group-hover:bg-primary group-hover:text-white transition-colors">
-                    {String.fromCharCode(65 + bp.order - 1)}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                      {bp.problem.title}
-                    </h3>
-                    <div className="flex items-center gap-3 mt-1 text-xs">
-                      <span
-                        className={`px-2 py-0.5 rounded font-medium tracking-wide uppercase
-                          ${
-                            bp.problem.difficulty === "EASY"
-                              ? "bg-green-500/10 text-green-500"
-                              : bp.problem.difficulty === "MEDIUM"
-                                ? "bg-yellow-500/10 text-yellow-500"
-                                : "bg-red-500/10 text-red-500"
-                          }`}
-                      >
-                        {bp.problem.difficulty}
-                      </span>
-                      <span className="text-muted-foreground">
-                        Time: {bp.problem.timeLimitMs}ms
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pr-4 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0 duration-300">
-                  <ArrowRight className="w-5 h-5 text-primary" />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ContestTabs contest={contest} />
       </main>
     </div>
   );

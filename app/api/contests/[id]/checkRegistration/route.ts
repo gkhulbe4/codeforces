@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { authOptions } from "@/lib/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -6,22 +7,28 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { id } = await params;
-    const { searchParams } = req.nextUrl;
-    const userId = searchParams.get("userId");
+    const { id: contestId } = await params;
+    const searchParams = req.nextUrl.searchParams;
 
-    if (!id || !userId) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+    const email = searchParams.get("email");
+
+    if (!email) {
+      return NextResponse.json({ isRegistered: false }, { status: 200 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      return NextResponse.json({ isRegistered: false }, { status: 200 });
     }
 
     const userParticipation = await prisma.contestParticipant.findUnique({
       where: {
         contestId_userId: {
-          contestId: id,
-          userId: userId,
+          contestId,
+          userId: user.id,
         },
       },
     });

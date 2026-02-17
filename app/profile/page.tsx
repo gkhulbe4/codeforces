@@ -31,7 +31,6 @@ export default function ProfilePage() {
     refetchOnMount: true,
     refetchOnWindowFocus: false,
   });
-  console.log(data);
 
   if (status === "loading") {
     return (
@@ -68,10 +67,10 @@ export default function ProfilePage() {
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
           <div className="bg-card border border-border/50 rounded-2xl p-8 shadow-lg shadow-black/5 relative overflow-hidden backdrop-blur-sm">
-            <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-primary to-accent"></div>
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
-                <div className="w-24 h-24 rounded-full p-1 bg-linear-to-br from-primary to-accent">
+                <div className="w-24 h-24 rounded-full p-1 bg-primary">
                   {session.user.image ? (
                     <Image
                       src={session.user.image}

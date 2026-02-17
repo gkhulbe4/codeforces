@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Clock, HardDrive, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { CodeEditor } from "@/components/problems/CodeEditor";
+import { CodeEditor } from "@/components/base/problems/CodeEditor";
 
 export const dynamic = "force-dynamic";
 

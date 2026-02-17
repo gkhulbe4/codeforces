@@ -42,48 +42,48 @@ export default async function ProblemsPage() {
         </div>
 
         <div className="grid gap-4 animate-slide-up">
-          {problems.map((problem: any, index) => (
+          {problems.map((problem: any, index: number) => (
             <Link
               key={problem.id}
               href={`/problems/${problem.id}`}
               className="group block"
             >
               <div
-                className="bg-card border border-border/50 rounded-xl p-5 hover:border-primary/50 hover:bg-card/80 transition-all duration-300 shadow-sm relative overflow-hidden"
+                className="bg-card border border-border/60 rounded-xl p-6 hover:border-border hover:bg-secondary/20 transition-all duration-200 shadow-sm hover:shadow-md relative overflow-hidden"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="text-primary w-5 h-5 -translate-x-4 group-hover:translate-x-0 transition-transform duration-300" />
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="space-y-1">
-                    <h3 className="font-display text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                <div className="flex items-center justify-between gap-6">
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <h3 className="font-display text-lg font-semibold text-foreground group-hover:text-primary transition-colors tracking-tight truncate">
                       {problem.title}
                     </h3>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground font-mono mt-2">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground font-medium">
                       <span
                         className={`px-2 py-0.5 rounded border ${
                           problem.difficulty === "EASY"
-                            ? "bg-green-500/10 text-green-600 border-green-500/20"
+                            ? "bg-green-500/5 text-green-600 border-green-500/20"
                             : problem.difficulty === "MEDIUM"
-                              ? "bg-yellow-500/10 text-yellow-600 border-yellow-500/20"
-                              : "bg-red-500/10 text-red-600 border-red-500/20"
-                        } font-semibold`}
+                              ? "bg-yellow-500/5 text-yellow-600 border-yellow-500/20"
+                              : "bg-red-500/5 text-red-600 border-red-500/20"
+                        } font-semibold tracking-wide uppercase`}
                       >
                         {problem.difficulty}
                       </span>
-                      <span className="flex items-center gap-1.5">
-                        <Brain size={12} className="text-primary/70" />
+                      <span className="flex items-center gap-1.5 opacity-80">
+                        <Brain size={14} className="text-primary/70" />
                         {problem._count?.submissions || 0} submissions
                       </span>
                       {problem.timeLimitMs && (
-                        <span className="flex items-center gap-1.5">
-                          <Clock size={12} />
+                        <span className="flex items-center gap-1.5 opacity-80">
+                          <Clock size={14} className="text-primary/70" />
                           {problem.timeLimitMs}ms
                         </span>
                       )}
                     </div>
+                  </div>
+
+                  <div className="pr-2 opacity-0 group-hover:opacity-100 transition-all duration-300 -translate-x-2 group-hover:translate-x-0">
+                    <ArrowRight className="text-primary w-5 h-5" />
                   </div>
                 </div>
               </div>
