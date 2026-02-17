@@ -19,6 +19,11 @@ export async function POST(req: NextRequest) {
       },
     });
     await redis.lpush(SUBMISSION_QUEUE, submission.id);
+
+    fetch(process.env.CLOUDFLARE_WORKER_URL!).catch((err) =>
+      console.error("Worker trigger failed:", err),
+    );
+
     return NextResponse.json(
       {
         message: "Solution submitted successfully",
